@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # vpn-client-ip-dns-sync.sh — Update a DigitalOcean DNS record when the VPN IP changes.
 #
-# Usage: vpn-client-ip-dns-sync.sh [<iface>] [--dry-run]
+# Usage: vpn-client-ip-dns-sync.sh <iface> [--dry-run]
 #
-#   <iface>    VPN tunnel interface (default: tun0, overrides VPN_IFACE in conf)
+#   <iface>    VPN tunnel interface name (required, e.g. tun0)
 #
 # Install:
 #   1. Copy to /usr/local/bin/vpn-client-ip-dns-sync.sh && chmod +x /usr/local/bin/vpn-client-ip-dns-sync.sh
@@ -17,14 +17,14 @@ set -euo pipefail
 CONF="/etc/vpn-client-ip-dns-sync.conf"
 [[ -f "$CONF" ]] && source "$CONF"
 
-DO_API_TOKEN="${DO_API_TOKEN:-}"          # DigitalOcean personal access token
-DOMAIN="${DOMAIN:-home.internal.example.com}"   # Zone in DO (e.g. example.com)
-RECORD_NAME="${RECORD_NAME:-ubuntu-server.home.internal}" # Subdomain part
-VPN_IFACE="${VPN_IFACE:-tun0}"           # fallback; overridden by positional arg below
+DO_API_TOKEN="${DO_API_TOKEN:-}"
+DOMAIN="${DOMAIN:-}"
+RECORD_NAME="${RECORD_NAME:-}"
 LOG_TAG="vpn-client-ip-dns-sync"
 
 # ─── Parse args ───────────────────────────────────────────────────────────────
 DRY_RUN=false
+VPN_IFACE=""
 for arg in "$@"; do
     case "$arg" in
         --dry-run) DRY_RUN=true ;;
@@ -32,6 +32,7 @@ for arg in "$@"; do
         *)         VPN_IFACE="$arg" ;;
     esac
 done
+[[ -z "$VPN_IFACE" ]] && { echo "Usage: $(basename "$0") <iface> [--dry-run]" >&2; exit 1; }
 
 STATE_FILE="${STATE_FILE:-/var/lib/vpn-client-ip-dns-sync/${VPN_IFACE}.last_ip}"
 
@@ -45,6 +46,8 @@ require_cmd ip
 require_cmd jq
 
 [[ -z "$DO_API_TOKEN" ]] && die "DO_API_TOKEN is not set. Check $CONF"
+[[ -z "$DOMAIN" ]]       && die "DOMAIN is not set. Check $CONF"
+[[ -z "$RECORD_NAME" ]]  && die "RECORD_NAME is not set. Check $CONF"
 
 # ─── Detect current VPN IP ───────────────────────────────────────────────────
 get_vpn_ip() {
