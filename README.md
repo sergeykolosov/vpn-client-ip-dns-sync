@@ -1,5 +1,7 @@
 # vpn-client-ip-dns-sync
 
+A vibe-coded solution to sync a *private network* VPN client IP to a public DNS record.
+
 Keeps a DigitalOcean DNS A record in sync with the current IP of a VPN tunnel interface on Ubuntu. Whenever the VPN reconnects and gets a new IP, the DNS record is updated automatically.
 
 Uses systemd [template units](https://www.freedesktop.org/software/systemd/man/systemd.unit.html#Description), so the interface name is a parameter — just like `wg-quick@wg0` or `wpa_supplicant@wlan0`:
