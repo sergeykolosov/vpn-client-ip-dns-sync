@@ -43,15 +43,29 @@ install -m 755 "$SCRIPT_DIR/openvpn/vpn-client-ip-dns-sync-up.sh" /etc/openvpn/s
 echo "    Add to your OpenVPN client config:  script-security 2"
 echo "                                         up /etc/openvpn/scripts/vpn-client-ip-dns-sync-up.sh"
 
-echo "==> Enabling and starting units for interface: $IFACE"
 systemctl daemon-reload
-systemctl enable --now "vpn-client-ip-dns-sync@${IFACE}.path"
-systemctl enable "vpn-client-ip-dns-sync@${IFACE}.service"   # service is triggered, not started directly
 
-echo ""
-echo "==> Test run (dry-run on $IFACE):"
-/usr/local/bin/vpn-client-ip-dns-sync.sh "$IFACE" --dry-run || true
+CONF_DOMAIN=$(grep -E '^DOMAIN=' /etc/vpn-client-ip-dns-sync.conf 2>/dev/null | cut -d= -f2- | tr -d '"'"'" | xargs)
+if [[ "$CONF_DOMAIN" == "example.com" || -z "$CONF_DOMAIN" ]]; then
+    echo ""
+    echo "*** Config not yet updated — skipping systemctl enable and dry-run."
+    echo "    Edit /etc/vpn-client-ip-dns-sync.conf, then run:"
+    echo ""
+    echo "      systemctl enable --now vpn-client-ip-dns-sync@${IFACE}.path"
+    echo "      systemctl enable vpn-client-ip-dns-sync@${IFACE}.service"
+    echo "      vpn-client-ip-dns-sync.sh ${IFACE} --dry-run"
+    echo ""
+    echo "    Monitor with:  journalctl -t vpn-client-ip-dns-sync -f"
+else
+    echo "==> Enabling and starting units for interface: $IFACE"
+    systemctl enable --now "vpn-client-ip-dns-sync@${IFACE}.path"
+    systemctl enable "vpn-client-ip-dns-sync@${IFACE}.service"   # service is triggered, not started directly
 
-echo ""
-echo "All done. Monitor with:  journalctl -t vpn-client-ip-dns-sync -f"
-echo "To enable for another interface:  systemctl enable --now vpn-client-ip-dns-sync@<iface>.path"
+    echo ""
+    echo "==> Test run (dry-run on $IFACE):"
+    /usr/local/bin/vpn-client-ip-dns-sync.sh "$IFACE" --dry-run || true
+
+    echo ""
+    echo "All done. Monitor with:  journalctl -t vpn-client-ip-dns-sync -f"
+    echo "To enable for another interface:  systemctl enable --now vpn-client-ip-dns-sync@<iface>.path"
+fi
