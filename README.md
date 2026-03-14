@@ -61,7 +61,8 @@ cd vpn-client-ip-dns-sync
 
 # 2. Create and edit the config
 sudo cp vpn-client-ip-dns-sync.conf.example /etc/vpn-client-ip-dns-sync.conf
-sudo nano /etc/vpn-client-ip-dns-sync.conf   # fill in DO_API_TOKEN, DOMAIN, RECORD_NAME
+sudo chmod 600 /etc/vpn-client-ip-dns-sync.conf   # contains API token — restrict to root
+sudo nano /etc/vpn-client-ip-dns-sync.conf         # fill in DO_API_TOKEN, DOMAIN, RECORD_NAME
 
 # 3. Run the installer (default interface: tun0)
 sudo bash install.sh
