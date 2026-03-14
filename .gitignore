@@ -1,5 +1,5 @@
 # Real config with credentials — never commit
-vpn-dns-sync.conf
+vpn-client-ip-dns-sync.conf
 
 # macOS
 .DS_Store

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Fires when any interface becomes routable. Only act on interfaces that have
+# a vpn-client-ip-dns-sync@ instance enabled.
+systemctl start "vpn-client-ip-dns-sync@${IFACE}.service" 2>/dev/null || true

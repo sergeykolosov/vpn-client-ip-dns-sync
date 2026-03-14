@@ -5,7 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/vpn-dns-sync.sh %i
+ExecStart=/usr/local/bin/vpn-client-ip-dns-sync.sh %i
 Restart=on-failure
 RestartSec=10s
 StartLimitIntervalSec=60

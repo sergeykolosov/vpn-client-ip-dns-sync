@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
-# vpn-dns-sync.sh — Update a DigitalOcean DNS record when the VPN IP changes.
+# vpn-client-ip-dns-sync.sh — Update a DigitalOcean DNS record when the VPN IP changes.
 #
-# Usage: vpn-dns-sync.sh [<iface>] [--dry-run]
+# Usage: vpn-client-ip-dns-sync.sh [<iface>] [--dry-run]
 #
 #   <iface>    VPN tunnel interface (default: tun0, overrides VPN_IFACE in conf)
 #
 # Install:
-#   1. Copy to /usr/local/bin/vpn-dns-sync.sh && chmod +x /usr/local/bin/vpn-dns-sync.sh
-#   2. Create /etc/vpn-dns-sync.conf (see config section below)
-#   3. Install the systemd template units: vpn-dns-sync@.service / vpn-dns-sync@.path
-#   4. Enable per-interface: systemctl enable --now vpn-dns-sync@tun0.path
+#   1. Copy to /usr/local/bin/vpn-client-ip-dns-sync.sh && chmod +x /usr/local/bin/vpn-client-ip-dns-sync.sh
+#   2. Create /etc/vpn-client-ip-dns-sync.conf (see config section below)
+#   3. Install the systemd template units: vpn-client-ip-dns-sync@.service / vpn-client-ip-dns-sync@.path
+#   4. Enable per-interface: systemctl enable --now vpn-client-ip-dns-sync@tun0.path
 
 set -euo pipefail
 
 # ─── Config ──────────────────────────────────────────────────────────────────
-CONF="/etc/vpn-dns-sync.conf"
+CONF="/etc/vpn-client-ip-dns-sync.conf"
 [[ -f "$CONF" ]] && source "$CONF"
 
 DO_API_TOKEN="${DO_API_TOKEN:-}"          # DigitalOcean personal access token
 DOMAIN="${DOMAIN:-home.internal.example.com}"   # Zone in DO (e.g. example.com)
 RECORD_NAME="${RECORD_NAME:-ubuntu-server.home.internal}" # Subdomain part
 VPN_IFACE="${VPN_IFACE:-tun0}"           # fallback; overridden by positional arg below
-LOG_TAG="vpn-dns-sync"
+LOG_TAG="vpn-client-ip-dns-sync"
 
 # ─── Parse args ───────────────────────────────────────────────────────────────
 DRY_RUN=false
@@ -33,7 +33,7 @@ for arg in "$@"; do
     esac
 done
 
-STATE_FILE="${STATE_FILE:-/var/lib/vpn-dns-sync/${VPN_IFACE}.last_ip}"
+STATE_FILE="${STATE_FILE:-/var/lib/vpn-client-ip-dns-sync/${VPN_IFACE}.last_ip}"
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 log()  { logger -t "$LOG_TAG" "$*"; echo "$(date -Is) $*"; }

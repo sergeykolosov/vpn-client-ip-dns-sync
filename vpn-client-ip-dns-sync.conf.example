@@ -1,5 +1,5 @@
-# /etc/vpn-dns-sync.conf
-# Loaded by vpn-dns-sync.sh
+# /etc/vpn-client-ip-dns-sync.conf
+# Loaded by vpn-client-ip-dns-sync.sh
 
 DO_API_TOKEN="dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
@@ -11,6 +11,6 @@ DOMAIN="example.com"
 RECORD_NAME="ubuntu-server.home.internal"
 
 
-# The VPN interface is set by the systemd instance name, e.g. vpn-dns-sync@tun0.
+# The VPN interface is set by the systemd instance name, e.g. vpn-client-ip-dns-sync@tun0.
 # Override STATE_FILE here only if you need a non-default path.
-# STATE_FILE="/var/lib/vpn-dns-sync/tun0.last_ip"
+# STATE_FILE="/var/lib/vpn-client-ip-dns-sync/tun0.last_ip"
