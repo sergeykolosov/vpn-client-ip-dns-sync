@@ -1,2 +1,4 @@
 #!/bin/sh
-[ "$IFACE" = "tun0" ] && /usr/local/bin/vpn-dns-sync.sh
+# Fires when any interface becomes routable. Only act on interfaces that have
+# a vpn-dns-sync@ instance enabled.
+systemctl start "vpn-dns-sync@${IFACE}.service" 2>/dev/null || true

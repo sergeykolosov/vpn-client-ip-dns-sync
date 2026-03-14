@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
 # vpn-dns-sync.sh — Update a DigitalOcean DNS record when the VPN IP changes.
 #
-# Usage: vpn-dns-sync.sh [--dry-run]
+# Usage: vpn-dns-sync.sh [<iface>] [--dry-run]
+#
+#   <iface>    VPN tunnel interface (default: tun0, overrides VPN_IFACE in conf)
 #
 # Install:
 #   1. Copy to /usr/local/bin/vpn-dns-sync.sh && chmod +x /usr/local/bin/vpn-dns-sync.sh
 #   2. Create /etc/vpn-dns-sync.conf (see config section below)
-#   3. Install the systemd service + path unit (see vpn-dns-sync.service / .path)
+#   3. Install the systemd template units: vpn-dns-sync@.service / vpn-dns-sync@.path
+#   4. Enable per-interface: systemctl enable --now vpn-dns-sync@tun0.path
 
 set -euo pipefail
 
@@ -17,11 +20,20 @@ CONF="/etc/vpn-dns-sync.conf"
 DO_API_TOKEN="${DO_API_TOKEN:-}"          # DigitalOcean personal access token
 DOMAIN="${DOMAIN:-home.internal.example.com}"   # Zone in DO (e.g. example.com)
 RECORD_NAME="${RECORD_NAME:-ubuntu-server.home.internal}" # Subdomain part
-VPN_IFACE="${VPN_IFACE:-tun0}"           # VPN tunnel interface
-STATE_FILE="${STATE_FILE:-/var/lib/vpn-dns-sync/last_ip}"
+VPN_IFACE="${VPN_IFACE:-tun0}"           # fallback; overridden by positional arg below
 LOG_TAG="vpn-dns-sync"
+
+# ─── Parse args ───────────────────────────────────────────────────────────────
 DRY_RUN=false
-[[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
+for arg in "$@"; do
+    case "$arg" in
+        --dry-run) DRY_RUN=true ;;
+        --*)       echo "Unknown option: $arg" >&2; exit 1 ;;
+        *)         VPN_IFACE="$arg" ;;
+    esac
+done
+
+STATE_FILE="${STATE_FILE:-/var/lib/vpn-dns-sync/${VPN_IFACE}.last_ip}"
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 log()  { logger -t "$LOG_TAG" "$*"; echo "$(date -Is) $*"; }

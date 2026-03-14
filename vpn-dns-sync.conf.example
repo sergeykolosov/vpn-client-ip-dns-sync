@@ -10,8 +10,7 @@ DOMAIN="example.com"
 # For ubuntu-server.home.internal.example.com, this is:
 RECORD_NAME="ubuntu-server.home.internal"
 
-# VPN tunnel interface
-VPN_IFACE="tun0"
 
-# File used to skip updates when IP hasn't changed
-STATE_FILE="/var/lib/vpn-dns-sync/last_ip"
+# The VPN interface is set by the systemd instance name, e.g. vpn-dns-sync@tun0.
+# Override STATE_FILE here only if you need a non-default path.
+# STATE_FILE="/var/lib/vpn-dns-sync/tun0.last_ip"

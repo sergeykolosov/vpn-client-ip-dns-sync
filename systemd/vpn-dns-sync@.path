@@ -1,5 +1,5 @@
 [Unit]
-Description=Watch for VPN IP changes on tun0
+Description=Watch for VPN IP changes on %i
 
 [Path]
 PathModified=/proc/net/fib_trie

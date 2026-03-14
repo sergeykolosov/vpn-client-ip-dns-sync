@@ -1,3 +1,4 @@
 #!/bin/sh
-# Sourced by OpenVPN with env vars set. Small delay lets the route settle.
-sleep 2 && /usr/local/bin/vpn-dns-sync.sh &
+# Called by OpenVPN on connect. $dev is the tunnel interface name (e.g. tun0).
+# Small delay lets the route settle before the sync runs.
+sleep 2 && systemctl start "vpn-dns-sync@${dev}.service" &
