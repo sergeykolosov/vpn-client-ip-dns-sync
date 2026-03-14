@@ -1,0 +1,2 @@
+#!/bin/sh
+[ "$IFACE" = "tun0" ] && /usr/local/bin/vpn-dns-sync.sh

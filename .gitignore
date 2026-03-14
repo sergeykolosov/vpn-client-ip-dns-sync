@@ -1,0 +1,10 @@
+# Real config with credentials — never commit
+vpn-dns-sync.conf
+
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*~
+.vscode/

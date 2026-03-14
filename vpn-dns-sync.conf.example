@@ -1,0 +1,17 @@
+# /etc/vpn-dns-sync.conf
+# Loaded by vpn-dns-sync.sh
+
+DO_API_TOKEN="dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# The zone as registered in DigitalOcean DNS (the part after the last two dots)
+DOMAIN="example.com"
+
+# The subdomain portion — DO stores it without the zone suffix
+# For ubuntu-server.home.internal.example.com, this is:
+RECORD_NAME="ubuntu-server.home.internal"
+
+# VPN tunnel interface
+VPN_IFACE="tun0"
+
+# File used to skip updates when IP hasn't changed
+STATE_FILE="/var/lib/vpn-dns-sync/last_ip"
